@@ -91,24 +91,24 @@ def request_data_form(request):
                         	req = form.cleaned_data['request']
                                 dslist = request_data(req)
 				table=ProductionDatasetsTable(dslist)
-                        	return render(request, '_request_table2.html', {
+                        	return render(request, '_request_table.html', {
                         	'active_app': 'getdatasets',
                         	'pre_form_text': 'Request datasets',
                         	'form': form,
 				'table': table,
                         	'submit_text': 'Select',
                         	'submit_url': 'getdatasets:request_data_form',
-                        	'parent_template': '_index.html',
+                        	'parent_template': 'prodtask/_index.html',
                         	})
 
         else:
                 form = RequestForm()
-                return render(request, '_request_table2.html', {
+                return render(request, '_request_table.html', {
                 'active_app': 'getdatasets',
                 'pre_form_text': 'Request datasets',
                 'form': form,
                 'submit_url': 'getdatasets:request_data_form',
-                'parent_template': '_index.html',
+                'parent_template': 'prodtask/_index.html',
                 })
 
 

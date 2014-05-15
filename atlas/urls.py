@@ -35,7 +35,6 @@ common_patterns = patterns('',
 
     url(r'^todo', include('atlas.todoview.urls', namespace='todoview')),
 
-
 #    ### TEST/Playground
 #    url(r'^test_playground/$', common_views.testing, name='testing'),
 #    url(r'^htc4/$', htcondor_views.list3HTCondorJobs, name='htc4'),
