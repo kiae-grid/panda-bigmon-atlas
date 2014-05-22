@@ -7,7 +7,8 @@ class ProductionDatasetsExec(models.Model):
     phys_group = models.CharField(max_length=20, db_column='PHYS_GROUP', null=True)
 
     class Meta:
-        app_label = "grisli"
+        #app_label = "grisli"
+        app_label = "panda"
         db_table = u"T_PRODUCTIONDATASETS_EXEC"
 
 class TRequest(models.Model):
