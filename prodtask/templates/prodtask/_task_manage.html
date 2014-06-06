@@ -1,0 +1,105 @@
+{% extends "prodtask/_task_table.html" %}
+{% load url from future %}
+{% load static from staticfiles %}
+
+
+{% block extra_js %}
+{{ block.super }}
+
+    <script type="text/javascript" src="{% static "js/foundation.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.json-2.4.min.js" %}"></script>
+
+    <script type="text/javascript">
+        $(document).foundation();
+    </script>
+
+{% endblock %}
+
+
+{% block body %}
+
+{{ block.super }}
+
+<div class="left" id="management_panel_container">
+    <div class="left">
+        <label class="column">
+            <br>
+            <input type="checkbox" id="select_all_tasks"/>
+            Select all
+            &nbsp;
+        </label>
+    </div>
+    <div class="right">
+
+        {% include "prodtask/_task_manage_panel.html" %}
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+function makeCheckbox(id, val, cls) {
+    html = $('<div />', { 'class': 'left' })
+       .append(
+         $('<input />',
+               { 'type': 'checkbox',
+                 'id': id,
+                 'value': val,
+                 'class': cls,
+              })
+        );
+    return html;
+}
+
+function onUpdateSelectedTasks() {
+    var tasks = [];
+    $(".cbx_task_select:checked").each( function () {
+        tasks.push( $(this).val() );
+    });
+
+    $("#selected_tasks").val(tasks.join(',')).change();
+}
+
+
+$(document).ready(function() {
+    // Adding management panel
+    $("#management_panel_container").insertBefore("#task_table_length");
+
+    $("#btn_switch_to_view").click(function() {
+        var view_url_base = $(location).attr('origin') + "{% url 'prodtask:task_table' %}"
+        var self_url_base = $(location).attr('origin') + $(location).attr('pathname');
+        var view_url_full = $(location).attr('href').replace(self_url_base, view_url_base);
+
+        $(location).attr('href', view_url_full);
+        return False;
+    });
+
+    $("#task_table_wrapper").on("draw", "#task_table", function() {
+       $("#task_table tr>td:first-child>a").each( function () {
+           href = $(this).attr("href");
+           var found = href.match( /\/task\/(\d+)\/?/ );
+           if (!found) { return true; }
+           var id = found[1];
+           makeCheckbox("select_task_" + id, id, "cbx_task_select").insertBefore( $(this) );
+       });
+
+       $("#select_all_tasks").prop('checked', false);
+
+    });
+
+    $("#select_all_tasks").click( function () {
+        $('.cbx_task_select').prop('checked', this.checked);
+        onUpdateSelectedTasks();
+    });
+
+    $("#task_table").on("change", "input.cbx_task_select", function() {
+        onUpdateSelectedTasks();
+    });
+
+});
+
+</script>
+
+{% endblock %}
+
