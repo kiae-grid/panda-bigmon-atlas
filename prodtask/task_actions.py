@@ -12,7 +12,7 @@ import atlas.settings
 rsa_key_file = "%s/%s" %(os.path.dirname(os.path.abspath(atlas.settings.__file__)), "jediclient-ssh/id_rsa")
 
 def _execJediCommand(task_id, command, *params):
-    jedi_commands = ['killTask', 'changeTaskPriority', 'reassignTaskToSite', 'reassignTaskToCloud']
+    jedi_commands = ['killTask', 'finishTask', 'changeTaskPriority', 'reassignTaskToSite', 'reassignTaskToCloud']
 
     if not command in jedi_commands:
         raise ValueError( "JEDI command not supported: '%s'" % (command) )
@@ -65,6 +65,9 @@ def _execJediCommand(task_id, command, *params):
 
 def killTask(task_id):
     return _execJediCommand(task_id, "killTask")
+
+def finishTask(task_id):
+    return _execJediCommand(task_id, "finishTask")
 
 def changeTaskPriority(task_id, priority):
     return _execJediCommand(task_id, "changeTaskPriority", priority)
