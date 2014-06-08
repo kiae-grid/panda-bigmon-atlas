@@ -14,7 +14,7 @@ from .models import ProductionTask, TRequest
 
 from .task_views import ProductionTaskTable, get_clouds, get_sites
 
-from .task_commands import killTask, changeTaskPriority, reassignTaskToSite, reassignTaskToCloud
+from .task_actions import killTask, changeTaskPriority, reassignTaskToSite, reassignTaskToCloud
 
 
 import json
