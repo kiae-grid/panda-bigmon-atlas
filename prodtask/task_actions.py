@@ -11,7 +11,7 @@ import atlas.settings
 
 rsa_key_file = "%s/%s" %(os.path.dirname(os.path.abspath(atlas.settings.__file__)), "jediclient-ssh/id_rsa")
 
-def _execJediCommand(task_id, command, *params):
+def _exec_jedi_command(task_id, command, *params):
     jedi_commands = ['killTask', 'finishTask', 'changeTaskPriority', 'reassignTaskToSite', 'reassignTaskToCloud']
 
     if not command in jedi_commands:
@@ -63,18 +63,18 @@ def _execJediCommand(task_id, command, *params):
     return result
 
 
-def killTask(task_id):
-    return _execJediCommand(task_id, "killTask")
+def kill_task(task_id):
+    return _exec_jedi_command(task_id, "killTask")
 
-def finishTask(task_id):
-    return _execJediCommand(task_id, "finishTask")
+def finish_task(task_id):
+    return _exec_jedi_command(task_id, "finishTask")
 
-def changeTaskPriority(task_id, priority):
-    return _execJediCommand(task_id, "changeTaskPriority", priority)
+def change_task_priority(task_id, priority):
+    return _exec_jedi_command(task_id, "changeTaskPriority", priority)
 
-def reassignTaskToSite(task_id, site):
-    return _execJediCommand(task_id, "reassignTaskToSite", site)
+def reassign_task_to_site(task_id, site):
+    return _exec_jedi_command(task_id, "reassignTaskToSite", site)
 
-def reassignTaskToCloud(task_id, cloud):
-    return _execJediCommand(task_id, "reassignTaskToCloud", cloud)
+def reassign_task_to_cloud(task_id, cloud):
+    return _exec_jedi_command(task_id, "reassignTaskToCloud", cloud)
 
