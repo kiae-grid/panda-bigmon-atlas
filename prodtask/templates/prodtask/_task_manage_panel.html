@@ -11,10 +11,33 @@
                 <li><a class="small radio button disabled" id="btn_clone" href="#">Clone</a></li>
         {% endif %}
 
-                <li><a data-dropdown="task_abort_menu" data-options="is_hover:true" class="small radio button alert"
-                       id="btn_abort">Abort</a></li>
-                <li><a data-dropdown="task_change_prio_menu" class="small radio button" id="btn_change_prio">Change&nbsp;priority</a></li>
-                <li><a data-dropdown="task_reassign_menu" class="small radio button" id="btn_reassign">Reassing</a></li>
+                <li><a data-options="is_hover:true" id="btn_abort"
+                    {% if can_abort_task or not task.id %}
+                        data-dropdown="task_abort_menu"
+                        class="small radio button alert"
+                    {% else %}
+                        class="small radio button alert disabled"
+                    {% endif %}
+                    >Abort</a>
+                </li>
+                <li><a id="btn_change_prio"
+                    {% if can_change_prio_task or not task.id %}
+                        class="small radio button"
+                        data-dropdown="task_change_prio_menu"
+                    {% else %}
+                        class="small radio button disabled"
+                    {% endif %}
+                    >Change&nbsp;priority</a>
+                </li>
+                <li><a id="btn_reassign"
+                    {% if can_reassign_task or not task.id %}
+                        data-dropdown="task_reassign_menu"
+                        class="small radio button"
+                    {% else %}
+                        class="small radio button disabled"
+                    {% endif %}
+                    >Reassing</a>
+                </li>
         {% if edit_mode %}
                 <li><a class="small radio button secondary" id="btn_switch_to_view">View&nbsp;mode</a></li>
         {% endif %}
