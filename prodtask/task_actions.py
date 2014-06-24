@@ -76,7 +76,7 @@ def finish_task(task_id):
     return _exec_jedi_command(task_id, "finishTask")
 
 
-def obsole_task(task_id):
+def obsolete_task(task_id):
     task = ProductionTask.objects.get(id=task_id)
     if task.status not in ['done', 'finished']:
         return {}
