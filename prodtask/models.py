@@ -221,6 +221,9 @@ class StepExecution(models.Model):
     def save_with_current_time(self, *args, **kwargs):
         if not self.step_def_time:
             self.step_def_time = timezone.now()
+        if self.status == 'Approved':
+            if not self.step_appr_time:
+                self.step_appr_time = timezone.now()
         self.save(*args, **kwargs)
 
     def save(self, *args, **kwargs):
@@ -446,7 +449,7 @@ def get_default_nEventsPerJob_dict():
 
 def get_default_project_mode_dict():
     default_dict = {
-         'Evgen':'cmtconfig=x86_64-slc5-gcc43-opt;spacetoken=ATLASDATADISK',
+         'Evgen':'spacetoken=ATLASDATADISK',
          'Simul':'cmtconfig=x86_64-slc5-gcc43-opt;spacetoken=ATLASDATADISK',
          'Merge':'cmtconfig=x86_64-slc5-gcc43-opt;spacetoken=ATLASMCTAPE',
          'Digi':'Npileup=5;spacetoken=ATLASDATADISK',
