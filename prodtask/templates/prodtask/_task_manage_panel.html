@@ -300,6 +300,11 @@ $(document).ready(function () {
         $("#task_finish_menu").hide();
     });
 
+    $("#btn_do_obsolete").click(function () {
+        doTasksAction('obsolete');
+        $("#task_obsolete_menu").hide();
+    });
+
     $("#btn_do_set_priority").click(function () {
         doTasksAction('change_priority');
         $("#task_change_prio_menu").hide();
