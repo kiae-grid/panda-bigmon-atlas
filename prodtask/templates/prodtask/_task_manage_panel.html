@@ -48,7 +48,7 @@
                     >Reassign</a>
                 </li>
                 <li><a data-options="is_hover:true" id="btn_obsolete"
-                    {% if can_obsolete_task %} or not task.id %}
+                    {% if can_obsolete_task or not task.id %}
                         data-dropdown="task_obsolete_menu"
                         class="small radio button"
                     {% else %}
