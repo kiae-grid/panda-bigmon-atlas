@@ -14,7 +14,7 @@ from .models import ProductionTask, TRequest, StepExecution
 
 from .task_views import ProductionTaskTable, get_clouds, get_sites
 
-from .task_actions import kill_task, finish_task, change_task_priority, reassign_task_to_site, reassign_task_to_cloud
+from .task_actions import kill_task, finish_task, obsolete_task, change_task_priority, reassign_task_to_site, reassign_task_to_cloud
 
 import json
 
@@ -22,6 +22,7 @@ import json
 _task_actions = {
     'kill': kill_task,
     'finish': finish_task,
+    'obsolete': obsolete_task,
     'change_priority': change_task_priority,
     'reassign_to_site': reassign_task_to_site,
     'reassign_to_cloud': reassign_task_to_cloud,
@@ -32,8 +33,6 @@ def do_tasks_action(tasks, action, *args):
 
     if (not tasks) or not (action in _task_actions):
         return
-
-    print action, args
 
     result = []
     for task in tasks:
