@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 import core.datatables as datatables
 
 from .forms import ProductionTaskForm, ProductionTaskCreateCloneForm, ProductionTaskUpdateForm
-from .models import ProductionTask, TRequest
+from .models import ProductionTask, TRequest, StepExecution
 
 from .task_views import ProductionTaskTable, get_clouds, get_sites
 
@@ -61,6 +61,25 @@ def tasks_action(request, action):
 
     params = data.get("parameters", [])
     response = do_tasks_action(tasks, action, *params)
+    return HttpResponse(json.dumps(response))
+
+
+def get_same_slice_tasks(request, tid):
+    """ Getting
+    :tid request: task ID
+    :return: tasks of the same slice as specified (JSON)
+    """
+    empty_response = HttpResponse('')
+
+    if not tid:
+        return empty_response
+
+    step_id = ProductionTask.objects.get(id=tid).step.id
+    slice_id = StepExecution.objects.get(id=step_id).slice.id
+    steps = [ str(x.get('id')) for x in StepExecution.objects.filter(slice=slice_id).values("id") ]
+    tasks = [ str(x.get('id')) for x in ProductionTask.objects.filter(step__in=steps).values("id") ]
+
+    response = dict(tasks=tasks)
     return HttpResponse(json.dumps(response))
 
 
