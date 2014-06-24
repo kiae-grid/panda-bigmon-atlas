@@ -80,7 +80,7 @@ def finish_task(task_id):
 def obsolete_task(task_id):
     # TODO: add logging and permissions checking
     task = ProductionTask.objects.get(id=task_id)
-    if task.status not in ['done', 'finished']:
+    if task and (task.status not in ['done', 'finished']):
         return {}
 
     #TODO: log action
