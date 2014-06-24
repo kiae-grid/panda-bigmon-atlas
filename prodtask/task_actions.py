@@ -8,6 +8,7 @@ import os.path
 import re
 import subprocess
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 import atlas.settings
 from .models import ProductionTask
@@ -79,8 +80,14 @@ def finish_task(task_id):
 
 def obsolete_task(task_id):
     # TODO: add logging and permissions checking
-    task = ProductionTask.objects.get(id=task_id)
-    if task and (task.status not in ['done', 'finished']):
+    try:
+        task = ProductionTask.objects.get(id=task_id)
+    except ObjectDoesNotExist:
+        return dict(accepted=True, registered=False, message="Task %s does not exist")
+    except Exception as error:
+        return dict(accepted=True, registered=False, message=error)
+
+    if task.status not in ['done', 'finished']:
         return {}
 
     #TODO: log action

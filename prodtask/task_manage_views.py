@@ -6,6 +6,7 @@ from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.core.exceptions import ObjectDoesNotExist
 
 import core.datatables as datatables
 
@@ -73,7 +74,12 @@ def get_same_slice_tasks(request, tid):
     if not tid:
         return empty_response
 
-    step_id = ProductionTask.objects.get(id=tid).step.id
+    try:
+        task = ProductionTask.objects.get(id=tid)
+    except:
+        return empty_response
+
+    step_id = task.step.id
     slice_id = StepExecution.objects.get(id=step_id).slice.id
     steps = [ str(x.get('id')) for x in StepExecution.objects.filter(slice=slice_id).values("id") ]
     tasks = [ str(x.get('id')) for x in ProductionTask.objects.filter(step__in=steps).values("id") ]
