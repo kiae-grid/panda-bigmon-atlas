@@ -1,8 +1,5 @@
 
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, render_to_response
-from django.template import Context, Template, RequestContext
-from django.template.loader import get_template
+from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
@@ -10,7 +7,6 @@ from django.core.exceptions import ObjectDoesNotExist
 
 import core.datatables as datatables
 
-from .forms import ProductionTaskForm, ProductionTaskCreateCloneForm, ProductionTaskUpdateForm
 from .models import ProductionTask, TRequest, StepExecution
 
 from .task_views import ProductionTaskTable, get_clouds, get_sites
@@ -31,7 +27,13 @@ _task_actions = {
 
 
 def do_tasks_action(tasks, action, *args):
-
+    """
+    Performing task actions
+    :param tasks: list of tasks affected
+    :param action: name of action
+    :param args: additional arguments
+    :return: array of actions' statuses
+    """
     if (not tasks) or not (action in _task_actions):
         return
 
@@ -45,6 +47,12 @@ def do_tasks_action(tasks, action, *args):
 
 
 def tasks_action(request, action):
+    """
+    Handling task actions requests
+    :param request: HTTP request object
+    :param action: action name
+    :return: HTTP response with action status (JSON)
+    """
     empty_response = HttpResponse('')
 
     if request.method != 'POST' or not (action in _task_actions):
@@ -65,9 +73,9 @@ def tasks_action(request, action):
 
 
 def get_same_slice_tasks(request, tid):
-    """ Getting
+    """ Getting all the tasks ids from the slice where specified task is
     :tid request: task ID
-    :return: tasks of the same slice as specified (JSON)
+    :return: tasks of the same slice as specified (dict)
     """
     empty_response = HttpResponse('')
 
@@ -93,9 +101,13 @@ def get_same_slice_tasks(request, tid):
 @never_cache
 @datatables.datatable(ProductionTaskTable, name='fct')
 def task_manage(request):
+    """
+
+    :param request: HTTP request
+    :return: rendered HTTP response
+    """
     qs = request.fct.get_queryset()
     last_task_submit_time = ProductionTask.objects.order_by('-submit_time')[0].submit_time
-
 
 
     return TemplateResponse(request, 'prodtask/_task_manage.html',
