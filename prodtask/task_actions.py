@@ -15,6 +15,7 @@ from .models import ProductionTask
 rsa_key_file = "%s/%s" %(os.path.dirname(os.path.abspath(atlas.settings.__file__)), "jediclient-ssh/id_rsa")
 
 def _exec_jedi_command(task_id, command, *params):
+    # TODO: add logging and permissions checking
     jedi_commands = ['killTask', 'finishTask', 'changeTaskPriority', 'reassignTaskToSite', 'reassignTaskToCloud']
 
     if not command in jedi_commands:
@@ -77,6 +78,7 @@ def finish_task(task_id):
 
 
 def obsolete_task(task_id):
+    # TODO: add logging and permissions checking
     task = ProductionTask.objects.get(id=task_id)
     if task.status not in ['done', 'finished']:
         return {}
