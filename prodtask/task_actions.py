@@ -79,7 +79,7 @@ def finish_task(task_id):
 def obsole_task(task_id):
     task = ProductionTask.objects.get(id=task_id)
     if task.status not in ['done', 'finished']:
-        return
+        return {}
 
     #TODO: log action
     ProductionTask.objects.filter(id=task_id).update(status='obsolete', timestamp=timezone.now())
