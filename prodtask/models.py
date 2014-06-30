@@ -38,8 +38,9 @@ class TProject(models.Model):
         db_table = u'"ATLAS_DEFT"."T_PROJECTS"'
 
 class TRequest(models.Model):
-    PHYS_GROUPS=[(x,x) for x in ['physics','Top','StandartModel','Exotics','SUSY','Higgs','JetEtmiss','Tau','FlavourTag',
-                                'Egamma','BPhys','TrackingPerf','HeavyIons','Muon','reprocessing','trig-hlt']]
+    PHYS_GROUPS=[(x,x) for x in ['physics','BPhysics','Btagging','DPC','Detector','EGamma','Exotics','HI','Higgs',
+                                 'InDet','JetMet','LAr','MuDet','Muon','SM','Susy','Tau','Top','Trigger','TrackingPerf',
+                                 'reprocessing','trig-hlt']]
     REQUEST_TYPE = [(x,x) for x in ['MC','GROUP','REPROCESSING','ANALYSIS','HLT']]
     reqid = models.DecimalField(decimal_places=0, max_digits=12, db_column='PR_ID', primary_key=True)
     manager = models.CharField(max_length=32, db_column='MANAGER', null=False, blank=True)
@@ -168,7 +169,7 @@ class InputRequestList(models.Model):
     slice = models.DecimalField(decimal_places=0, max_digits=12, db_column='SLICE', null=False)
     brief = models.CharField(max_length=150, db_column='BRIEF')
     phys_comment = models.CharField(max_length=256, db_column='PHYSCOMMENT')
-    comment = models.CharField(max_length=256, db_column='SLICECOMMENT')
+    comment = models.CharField(max_length=512, db_column='SLICECOMMENT')
     input_data = models.CharField(max_length=150, db_column='INPUTDATA')
     project_mode = models.CharField(max_length=256, db_column='PROJECT_MODE')
     priority = models.DecimalField(decimal_places=0, max_digits=12, db_column='PRIORITY')
@@ -302,7 +303,6 @@ class ProductionTask(models.Model):
     submit_time = models.DateTimeField(db_column='SUBMIT_TIME', null=False)
     start_time = models.DateTimeField(db_column='START_TIME', null=True)
     timestamp = models.DateTimeField(db_column='TIMESTAMP', null=True)
-    bug_report = models.DecimalField(decimal_places=0, max_digits=12, db_column='BUG_REPORT', null=False)
     pptimestamp = models.DateTimeField(db_column='PPTIMESTAMP', null=True)
     postproduction = models.CharField(max_length=128, db_column='POSTPRODUCTION', null=True)
     priority = models.DecimalField(decimal_places=0, max_digits=5, db_column='PRIORITY', null=True)
