@@ -12,6 +12,9 @@
                 <li><a class="small radio button disabled" id="btn_clone" href="#">Clone</a></li>
         {% endif %}
 
+                {% comment %}
+                TODO: optimize this with a loop ('can_*' to 'permissions' dict)
+                {% endcomment %}
                 <li><a data-options="is_hover:true" id="btn_abort"
                     {% if can_abort_task or not task.id %}
                         data-dropdown="task_abort_menu"
@@ -63,6 +66,9 @@
             </ul>
         </div>
 
+        {% comment %}
+        TODO: optimize with a loop
+        {% endcomment %}
         <div id="task_abort_menu" class="small content f-dropdown" data-dropdown-content>
             <div class="small-12 large-12 columns">
                 <div class="row">
