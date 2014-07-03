@@ -240,6 +240,7 @@ function makeModalDialog(content) {
 }
 
 
+// Make and show modal dialog to confirm which action affects more tasks than it was selected
 function makeTasksActionConfirmDialog(title, action_alias, tasks_affected, callback) {
     function makeButtonBar(groups) {
         var $bar = $("<div/>", { class: "button-bar" });
@@ -283,6 +284,7 @@ function makeTasksActionConfirmDialog(title, action_alias, tasks_affected, callb
 }
 
 
+// Get list of tasks selected with checkboxes
 function getSelectedTasksList() {
     var tasks = $("#selected_tasks").val().split(',');
     if (tasks.length == 1 && !tasks[0]) {
