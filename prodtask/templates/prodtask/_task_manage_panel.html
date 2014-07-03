@@ -433,44 +433,21 @@ $(document).ready(function () {
 
     }
 
-    // TODO: optimize this with a cycle
     // Setting buttons handlers
-    $("#btn_do_abort").click(function () {
-        doTasksActionSelected('kill');
-        $("#task_abort_menu").hide();
-    });
+    var button_action_map = {
+        "abort": "kill", "finish": "finish", "obsolete": "obsolete",
+        "set_priority": "change_priority",
+        "reassign_cloud": "reassign_to_cloud", "reassign_site": "reassign_to_site"
+    };
 
-    $("#btn_do_finish").click(function () {
-        doTasksActionSelected('finish');
-        $("#task_finish_menu").hide();
-    });
-
-    $("#btn_do_obsolete").click(function () {
-        doTasksActionSelected('obsolete');
-        $("#task_obsolete_menu").hide();
-    });
-
-    $("#btn_do_set_priority").click(function () {
-        doTasksActionSelected('change_priority');
-        $("#task_change_prio_menu").hide();
-
-    });
-
-    $("#btn_do_reassign_cloud").click(function() {
-        doTasksActionSelected('reassign_to_cloud');
-        $("#task_reassign_menu").hide();
-    });
-
-    $("#btn_do_reassign_site").click(function() {
-        doTasksActionSelected('reassign_to_site');
-        $("#task_reassign_menu").hide();
-    });
-
-
-   $("[id^=btn_do_]").click(function() {
-       $("#select_all_tasks").prop("checked", false);
-       $("#select_all_tasks").change();
-   });
+    $.each(button_action_map, function(name, action) {
+        $("#btn_do_" +name).click(function(){
+            $('[id^="task_"][id$="_menu"]').hide(); // hide actions menus
+            doTasksActionSelected( button_action_map[name] );
+            $("#select_all_tasks").prop("checked", false); // un-check tasks after action
+            $("#select_all_tasks").change();
+        }); // on click
+    }); // $.each
 
 
     $("#selected_tasks").change(function () {
