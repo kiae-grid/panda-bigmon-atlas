@@ -386,7 +386,7 @@ function doTasksActionSelected(action) {
             tasks_affected[task_id] = [];
             var dependent = slices[task_id];
             for (var dep_id in dependent) {
-                if ( (dep_id>task_id)  && ($.inArray(dependent[dep_id]['status'], actions_on_active) > -1) ) {
+                if ( (dep_id>task_id)  && ($.inArray(dependent[dep_id]['status'], status_active) > -1) ) {
                     show_dialog = true;
                     tasks_affected[task_id].push(dep_id);
                     tasks_affected_arr.push(dep_id);
