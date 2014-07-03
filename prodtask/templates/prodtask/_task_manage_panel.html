@@ -387,6 +387,10 @@ function doTasksActionSelected(action) {
         });
     }
 
+    if (tasks.length == 0) {
+        return;
+    }
+
     if ($.inArray(action, cascade_actions) > -1) {
         var show_dialog = false; // before showing dialog, check if other than selected tasks are affected
         var tasks_affected = {};
