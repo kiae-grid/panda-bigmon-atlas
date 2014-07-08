@@ -4,6 +4,7 @@ To be replaced with upcoming DEFT API functions
 """
 
 import ast
+import json
 import os.path
 import re
 import subprocess
@@ -11,7 +12,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
 import atlas.settings
-from .models import ProductionTask
+from .models import InputRequestList, MCPriority, ProductionTask, StepExecution, StepTemplate
 
 RSA_KEY_FILE = "%s/%s" % (os.path.dirname(os.path.abspath(atlas.settings.__file__)),
                           "jediclient-ssh/id_rsa")
@@ -129,6 +130,72 @@ def change_task_priority(task_id, priority):
     :return: dict with action status
     """
     return _exec_jedi_command(task_id, "changeTaskPriority", priority)
+
+
+def get_step_priority(priority_key, step_name):
+    """ Get JEDI priority from the step template
+    :param priority_key: priority level (<100)
+    :param step_name: name of the step in question
+    :return: value of JEDI priority of the step
+    """
+    try:
+        mc_priority = MCPriority.objects.get(priority_key=priority_key)
+    except ObjectDoesNotExist:
+        return
+    priority_dict = json.loads(mc_priority.priority_dict)
+    if step_name in priority_dict:
+        return priority_dict[step_name]
+    else:
+        return
+
+
+def get_task_priority_level(task_id):
+    """
+    Get task priority level (if any) and
+    :param task_id:
+    :return:
+    """
+
+    result = dict(id=task_id, successful=False, level=None, priority=None)
+
+    try:
+        task = ProductionTask.objects.get(id=task_id)
+    except ObjectDoesNotExist:
+        result.update(reason="Task not found")
+        return result
+
+    step = task.step
+    input_dataset = step.slice
+    priority = input_dataset.priority
+
+    if priority < 100: # having a priority level here
+        step_name = step.step_template.step
+        priority_value = get_step_priority(priority, step_name)
+        result.update(level=priority, priority=priority_value)
+    else: # just a plain priority
+        result.update(priority=priority, reason="")
+
+    result.update(successful=True)
+    return result
+
+
+def change_task_priority_level(task_id):
+    """
+
+    :param task_id:
+    :return:
+    """
+    try:
+        task = ProductionTask.objects.get(id=task_id)
+    except:
+        pass
+
+
+def increase_task_priority(task_id):
+    pass
+
+def decrease_task_priority(task_id):
+    pass
 
 
 def reassign_task_to_site(task_id, site):
