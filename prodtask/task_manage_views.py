@@ -87,8 +87,7 @@ def get_same_slice_tasks(request, tid):
     except:
         return empty_response
 
-    step_id = task.step.id
-    slice_id = StepExecution.objects.get(id=step_id).slice.id
+    slice_id = task.step.slice.id
     steps = [ str(x.get('id')) for x in StepExecution.objects.filter(slice=slice_id).values("id") ]
     tasks = {}
     for task in ProductionTask.objects.filter(step__in=steps).only("id", "status"):
