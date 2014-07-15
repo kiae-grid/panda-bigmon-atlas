@@ -52,7 +52,8 @@ def _exec_jedi_command(task_id, command, *params):
     out = [x.rstrip() for x in out if not bash_lines.match(x)]
     out = filter(None, out)  # remove empty lines
 
-    result = {}
+    result = dict(task=task_id)
+
     if not out:
         return result
 
@@ -132,31 +133,33 @@ def change_task_priority(task_id, priority):
     return _exec_jedi_command(task_id, "changeTaskPriority", priority)
 
 
-def get_step_priority(priority_key, step_name):
-    """ Get JEDI priority from the step template
-    :param priority_key: priority level (<100)
-    :param step_name: name of the step in question
-    :return: value of JEDI priority of the step
-    """
-    try:
-        mc_priority = MCPriority.objects.get(priority_key=priority_key)
-    except ObjectDoesNotExist:
-        return
-    priority_dict = json.loads(mc_priority.priority_dict)
-    if step_name in priority_dict:
-        return priority_dict[step_name]
-    else:
-        return
-
-
-def get_task_priority_level(task_id):
+def get_task_priority_levels(task_id):
     """
     Get task priority level (if any) and
     :param task_id:
     :return:
     """
 
-    result = dict(id=task_id, successful=False, level=None, priority=None)
+    def get_priority_levels():
+        """ Get JEDI priority levels from the step template
+        :param priority_key: priority level (<100)
+        :param step_name: name of the step in question
+        :return: value of JEDI priority of the step { name: {level: priority, ...}, ...}
+        """
+        levels = {}
+        for prio in MCPriority.objects.all():
+            try:
+                named_priorities = json.loads(prio.priority_dict)
+            except:
+                continue
+            for name, priority in named_priorities.items():
+                if not levels.get(name):
+                    levels[name] = {}
+                levels[name][int(prio.priority_key)] = priority
+
+        return levels
+
+    result = dict(id=task_id, current_level=None, levels={}, current_priority=None)
 
     try:
         task = ProductionTask.objects.get(id=task_id)
@@ -165,37 +168,65 @@ def get_task_priority_level(task_id):
         return result
 
     step = task.step
-    input_dataset = step.slice
-    priority = input_dataset.priority
+    slice_priority = step.slice.priority
 
-    if priority < 100: # having a priority level here
+    result["current_priority"] = int(task.current_priority or task.priority)
+
+    if slice_priority < 100:  # having a priority level here
         step_name = step.step_template.step
-        priority_value = get_step_priority(priority, step_name)
-        result.update(level=priority, priority=priority_value)
-    else: # just a plain priority
-        result.update(priority=priority, reason="")
+        levels = get_priority_levels()
+        result["levels"] = levels.get(step_name, {})
 
-    result.update(successful=True)
+    result["successful"] = True
     return result
 
 
-def change_task_priority_level(task_id):
+def shift_task_priority(task_id, level_shift, priority_shift=None):
     """
-
-    :param task_id:
+    Shifting task priority up or down
+    :param task_id: Task ID
+    :param level_shift: if > 0, increasing the priority, otherwise decreasing. Has precedence over priority_shift.
+    :param priority_shift:
     :return:
     """
-    try:
-        task = ProductionTask.objects.get(id=task_id)
-    except:
-        pass
+
+    levels_info = get_task_priority_levels(task_id)
+    levels = levels_info.get("levels")
+    current_prio = levels_info.get("current_priority")
+
+    result = dict()
+
+    if levels:
+        levels = levels.values
+
+    if not levels and (priority_shift is not None):
+        return change_task_priority(task_id, current_prio+priority_shift)
+
+    if level_shift > 0:
+        next_priorities = sorted([x for x in levels if x > current_prio])
+    else:
+        next_priorities = sorted([x for x in levels if x < current_prio])
+
+    if not next_priorities:  # limit value is reached
+        return result
+
+    new_priority = next_priorities[0]
+    return change_task_priority(task_id, new_priority)
 
 
-def increase_task_priority(task_id):
-    pass
+def increase_task_priority(task_id, delta=None):
+    if isinstance(delta, int):
+        return shift_task_priority(task_id=task_id, level_shift=-1, priority_shift=delta)
+    else:
+        return shift_task_priority(task_id=task_id, level_shift=-1)
 
-def decrease_task_priority(task_id):
-    pass
+
+def decrease_task_priority(task_id, delta=None):
+    if isinstance(delta, int):
+        return shift_task_priority(task_id=task_id, level_shift=1, priority_shift=-delta)
+    else:
+        return shift_task_priority(task_id=task_id, level_shift=1)
+
 
 
 def reassign_task_to_site(task_id, site):
@@ -211,9 +242,17 @@ def reassign_task_to_site(task_id, site):
 def reassign_task_to_cloud(task_id, cloud):
     """
     Reassign task to specified cloud
-    :param task_id: task ID
+    :param task_id: Task ID
     :param cloud: cloud name
     :return: dict with action status
     """
     return _exec_jedi_command(task_id, "reassignTaskToCloud", cloud)
 
+
+def retry_task(task_id):
+    """
+    Resubmit specified task
+    :param task_id: Task ID
+    :return: dict with action status
+    """
+    _exec_jedi_command(task_id, "retryTask")
