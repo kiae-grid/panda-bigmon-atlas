@@ -1,8 +1,33 @@
 
 from os.path import dirname, join
+import sys
 
 import core
 import atlas
+
+
+## Inherit some variables from the core module if they are
+## not defined in our configuration.  Inject them to the
+## namespace to allow for usual "from .local import XXX".
+
+inherit_vars = ('MY_SECRET_KEY', 'dbaccess', 'LOG_ROOT', 'defaultDatetimeFormat')
+__local_module = ".".join(__name__.split(".")[0:-1] + ["local"])
+__core_module = sys.modules["core.common.settings"]
+try:
+    __module = __import__(__local_module, globals(), locals(), inherit_vars, -1)
+except ImportError, e:
+    # Django usually catches exception and prints not so meaningful
+    # traceback, so provide our own one too.
+    import traceback
+    print("Error importing module %s: %s" % (__local_module, e))
+    traceback.print_tb(sys.exc_traceback, None)
+    raise e
+for name in inherit_vars:
+    try:
+        getattr(__module, name)
+    except AttributeError:
+        setattr(__module, name, getattr(__core_module, name))
+
 
 from .local import MY_SECRET_KEY, dbaccess
 
