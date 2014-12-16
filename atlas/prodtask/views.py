@@ -12,10 +12,11 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 import time
 from ..prodtask.settings import APP_SETTINGS
 from ..prodtask.ddm_api import find_dataset_events
-from .request_views import fill_dataset
+
 
 
 import core.datatables as datatables
@@ -128,9 +129,22 @@ def approve_existed_step(step, new_status):
     pass
 
 
+#TODO: Change it to real dataset workflow
+def fill_dataset(ds):
+    dataset = None
+    try:
+        dataset = ProductionDataset.objects.all().filter(name=ds)[0]
+    except:
+        pass
+    finally:
+        if dataset:
+            return dataset
+        else:
+            dataset = ProductionDataset.objects.create(name=ds, files=-1, timestamp=timezone.now())
+            dataset.save()
+            return dataset
 
-
-def form_step_in_page(ordered_existed_steps,STEPS):
+def form_step_in_page(ordered_existed_steps,STEPS, is_foreign):
     if STEPS[0]:
         return_list = []
         i = 0
@@ -150,7 +164,11 @@ def form_step_in_page(ordered_existed_steps,STEPS):
             raise ValueError('Not consistent chain')
         return return_list
     else:
-        return ordered_existed_steps+[None]*(len(STEPS)-len(ordered_existed_steps))
+        if is_foreign:
+            return [None]+ordered_existed_steps+[None]*(len(STEPS)-len(ordered_existed_steps)-1)
+        else:
+            return ordered_existed_steps+[None]*(len(STEPS)-len(ordered_existed_steps))
+
 
 
 
@@ -189,7 +207,7 @@ def create_steps(slice_steps, reqid, STEPS=StepExecution.STEPS, approve_level=99
                 foreign_step = int(steps_status[-1]['foreign_id'])
                 parent_step = StepExecution.objects.get(id=foreign_step)
             steps_status.pop()
-            step_as_in_page = form_step_in_page(ordered_existed_steps,STEPS)
+            step_as_in_page = form_step_in_page(ordered_existed_steps,STEPS,existed_foreign_step)
             # if foreign_step !=0 :
             #     step_as_in_page = [None] + step_as_in_page
             first_not_approved_index = 0
@@ -411,7 +429,7 @@ def find_input_datasets(request, reqid):
 
         return HttpResponse(json.dumps(results), content_type='application/json')
 
-MC_COORDINATORS= ['cgwenlan','jzhong','jgarcian','mcfayden','jferrand','mehlhase']
+MC_COORDINATORS= ['cgwenlan','jzhong','jgarcian','mcfayden','jferrand','mehlhase','schwanen','lserkin']
 
 def request_approve_status(production_request, request):
     if (production_request.request_type == 'MC') and (production_request.phys_group != 'VALI'):
@@ -444,6 +462,23 @@ Request %i has been registered by %s and is waiting approval:
         return 'approved'
 
 
+def remove_input(good_slices, reqid):
+    removed_input_slices = []
+    for slice_number in good_slices:
+        input_list = InputRequestList.objects.get(request=reqid, slice=int(slice_number))
+        existed_steps = StepExecution.objects.filter(request=reqid, slice=input_list)
+        try:
+            ordered_existed_steps, existed_foreign_step = form_existed_step_list(existed_steps)
+            if (ordered_existed_steps[0].step_template.step == 'Evgen') and (ordered_existed_steps[0].status in ['NotChecked','Approved']):
+                if input_list.dataset:
+                    input_list.dataset = None
+                    input_list.save()
+                    removed_input_slices.append(slice_number)
+        except:
+            pass
+    return removed_input_slices
+
+
 def request_steps_approve_or_save(request, reqid, approve_level):
     results = {'success':False}
     try:
@@ -470,6 +505,7 @@ def request_steps_approve_or_save(request, reqid, approve_level):
             if not (req.manager) or (req.manager == 'None'):
                 missing_tags.append('No manager name!')
             else:
+                removed_input = []
                 if req.request_type == 'MC':
                     for steps_status in slice_steps.values():
                         for index,steps in enumerate(steps_status[:-2]):
@@ -477,6 +513,8 @@ def request_steps_approve_or_save(request, reqid, approve_level):
                                 if not steps['formats']:
                                     steps['formats'] = 'AOD'
                     error_slices, no_action_slices = create_steps(slice_steps,reqid,StepExecution.STEPS, approve_level)
+                    good_slices = [int(x) for x in slices if int(x) not in error_slices]
+                    removed_input = remove_input(good_slices,reqid)
                 else:
                     error_slices, no_action_slices = create_steps(slice_steps,reqid,['']*len(StepExecution.STEPS), approve_level)
 
@@ -494,6 +532,7 @@ def request_steps_approve_or_save(request, reqid, approve_level):
                                                    status=req.cstatus)
                     request_status.save_with_current_time()
                 if req.request_type == 'MC':
+
                     for slice, new_dataset in slice_new_input.items():
                         if new_dataset:
                             input_list = InputRequestList.objects.filter(request=req, slice=int(slice))[0]
@@ -503,7 +542,8 @@ def request_steps_approve_or_save(request, reqid, approve_level):
                            'slices': [x for x in map(int,slices) if x not in (error_slices + no_action_slices)],
                            'wrong_slices':wrong_skipping_slices,
                            'double_trf':old_double_trf, 'error_slices':error_slices,
-                           'no_action_slices' :no_action_slices,'success': True, 'new_status': req.cstatus}
+                           'no_action_slices' :no_action_slices,'success': True, 'new_status': req.cstatus,
+                           'removed_input':removed_input}
         else:
             _logger.debug("Some tags are missing: %s" % missing_tags)
     except Exception, e:
