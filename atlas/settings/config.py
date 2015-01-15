@@ -46,7 +46,8 @@ ALLOWED_HOSTS = [
 
 ### VIRTUALENV
 #VIRTUALENV_PATH = '/data/virtualenv/django1.6.1__python2.6.6__jedimon'
-VIRTUALENV_PATH = '/data/virtualenv/django1.6.1__python2.6.6__atlas'
+# VIRTUALENV_PATH = '/data/virtualenv/django1.6.1__python2.6.6__atlas'
+VIRTUALENV_PATH = '/data/pandamon/maria/venv'
 
 ### WSGI
 WSGI_PATH = VIRTUALENV_PATH + '/pythonpath'
