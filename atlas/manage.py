@@ -12,7 +12,7 @@ PYTHONPATH = [
     join(dirname(__file__), pardir),
     "..//..//bigpandamon-core",
 ]
-
+print PYTHONPATH
 # inject few paths to pythonpath
 for p in PYTHONPATH:
     if p not in sys.path:
