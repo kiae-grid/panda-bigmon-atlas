@@ -12,6 +12,7 @@ print DJANGO_SETTINGS_MODULE
 PYTHONPATH = [
     join(dirname(__file__), pardir),
     "..//..//bigpandamon-core",
+    "/data/pandamon/maria/settings:/data/pandamon/maria/src/shibsso:/data/pandamon/maria/src/panda-bigmon-core:/data/pandamon/maria/src/panda-bigmon-atlas",
 ]
 print PYTHONPATH
 # inject few paths to pythonpath
