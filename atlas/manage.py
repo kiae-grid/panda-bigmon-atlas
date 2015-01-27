@@ -7,6 +7,7 @@ from os.path import join, pardir, abspath, dirname, split
 # fix PYTHONPATH and DJANGO_SETTINGS for us
 # django settings module
 DJANGO_SETTINGS_MODULE = '%s.%s' % (split(abspath(dirname(__file__)))[1], 'settings')
+print DJANGO_SETTINGS_MODULE
 # pythonpath dirs
 PYTHONPATH = [
     join(dirname(__file__), pardir),
