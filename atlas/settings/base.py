@@ -38,7 +38,7 @@ INSTALLED_APPS_BIGPANDAMON_ATLAS = (
     ### as part of cross-linking between jobs and tasks monitoring
     'atlas.todoview',
 )
-INSTALLED_APPS = COMMON_INSTALLED_APPS + INSTALLED_APPS_BIGPANDAMON_ATLAS
+INSTALLED_APPS = ('django_cassandra_engine',) + COMMON_INSTALLED_APPS + INSTALLED_APPS_BIGPANDAMON_ATLAS
 
 
 ROOT_URLCONF = 'atlas.urls'
