@@ -48,9 +48,7 @@ sys.path.append(path + '/pythonpath')
 DJANGO_SETTINGS_MODULE = '%s.%s' % (split(abspath(dirname(__file__)))[1], 'settings')
 # pythonpath dirs
 PYTHONPATH = [
-    join(dirname(__file__), pardir),
-#    "/data/pandamon/maria/settings:/data/pandamon/maria/src/shibsso:/data/pandamon/maria/src/panda-bigmon-core:/data/pandamon/maria/src/panda-bigmon-atlas",
-    "/data/pandamon/maria/settings:/data/pandamon/maria/src/shibsso:/data/pandamon/maria/src/panda-bigmon-core:/data/pandamon/maria/src/panda-bigmon-atlas:/data/pandamon/maria/src/panda-bigmon-lsst:/data/pandamon/maria/src/pbm",
+    join(dirname(__file__), pardir), "/data/pandamon/maria/settings:/data/pandamon/maria/src/shibsso:/data/pandamon/maria/src/panda-bigmon-core:/data/pandamon/maria/src/panda-bigmon-atlas"
 ]
 
 # inject few paths to pythonpath
