@@ -39,7 +39,7 @@ site.addsitedir(virtualenvPath + '/lib/python2.6/site-packages')
 
 # Add the app's directory to the PYTHONPATH
 sys.path.append(path)
-sys.path.append(path + '/pythonpath' + '/data/pandamon/maria/settings' + '/data/pandamon/maria/src/shibsso' + '/data/pandamon/maria/src/panda-bigmon-core' + '/data/pandamon/maria/src/panda-bigmon-atlas')
+sys.path.append(path + '/pythonpath')
 
 #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bigpandamon.settings")
 #os.environ["DJANGO_SETTINGS_MODULE"] = "atlas.settings"
@@ -48,7 +48,7 @@ sys.path.append(path + '/pythonpath' + '/data/pandamon/maria/settings' + '/data/
 DJANGO_SETTINGS_MODULE = '%s.%s' % (split(abspath(dirname(__file__)))[1], 'settings')
 # pythonpath dirs
 PYTHONPATH = [
-    join(dirname(__file__), pardir), "/data/pandamon/maria/settings:/data/pandamon/maria/src/shibsso:/data/pandamon/maria/src/panda-bigmon-core:/data/pandamon/maria/src/panda-bigmon-atlas"
+    join(dirname(__file__), pardir)
 ]
 
 # inject few paths to pythonpath
